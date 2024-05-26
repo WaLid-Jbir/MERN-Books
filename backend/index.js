@@ -1,36 +1,25 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from'mongoose';
-import { Book } from './models/bookModel.js';
+import booksRoute from './routes/booksRoute.js';
 dotenv.config();
 
 const PORT = 5555 || process.env.PORT;
 
 const app = express();
 
-app.get('/', (req, res) => {
-    res.send("Hello Woeld!");
-});
+/** ############ Middlewares ############
+ * 1- This middleware is used to handle JSON-encoded bodies.
+ * 2- Mounts the books route at the '/books' path.
+ */
+app.use(express.json());
+app.use("/books", booksRoute);
 
-// Handles the creation of a new book in the system
-app.post("/books", async (req, res) => {
-  try {
-    if (!req.body.title || !req.body.author || !req.body.publishYear) {
-      res
-        .status(400)
-        .send({ message: "Please provide all the required fields" });
-    }
-    const newBook = {
-      title: req.body.title,
-      author: req.body.author,
-      publishYear: req.body.publishYear,
-    };
-    const book = await Book.create(newBook);
-    res.status(201).send(book);
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).send({ message: error.message });
-  }
+/**
+ * Handles the root route '/' and sends a welcome message to the client.
+ */
+app.get("/", (req, res) => {
+  res.send("Welsome to our books store!");
 });
 
 // Connect to MongoDB
